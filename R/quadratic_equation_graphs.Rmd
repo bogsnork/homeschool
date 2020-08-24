@@ -1,0 +1,277 @@
+---
+title: "Quadratic equations"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+library(polynom)
+polynomial(1:4)
+p <- as.polynomial(c(1,0,3,0))
+p
+print(p, decreasing = TRUE)
+stopifnot(coef(p) == c(1,0,3))
+
+polynomial(c(2,rep(0,10),1))
+
+
+
+```
+
+
+
+```{r}
+data <- data.frame(x = seq(-10,10, by = 0.5))
+
+equations <- c("y1" = expression(x + 1), 
+               "y2" = expression(x^2 + 1), 
+               "y3" = expression(x^2 + x + 1), 
+               "y6" = expression(-x^2 + x + 1))
+
+data <- data %>% 
+  mutate(
+    y1 = x + 1, y2 = x^2 + 1, y3 = x^2 + x + 1, y4 = 2*x^2 + x + 1, 
+    y5 = x^2 + (2*x) + 1, y6 = -x^2 + x + 1
+  )
+ 
+data_ty <- data %>% pivot_longer(names_to = "equation", values_to = "y", -x) 
+```
+
+```{r fig.width=10, dpi=600}
+ggplot(data_ty, aes(x = x, y = y, colour = equation)) +
+  geom_line(size = 1) + geom_point() +
+  geom_hline(aes(yintercept = 0)) + geom_vline(aes(xintercept = 0)) +
+  scale_color_brewer(palette = "Set2", labels = equations) +
+  theme_minimal() +
+  coord_equal(xlim = c(-5,5), ylim = c(-10,10)) +
+  scale_x_continuous(breaks = c(-5:5)) +
+  scale_y_continuous(breaks = c(-10:10)) 
+  NULL
+
+ggsave("Outputs/quadratics1.png")
+```
+
+```{r fig.width=10, dpi=600}
+equations <- data.frame(equations =
+  c("y1" = "x", 
+  "y2" = "-x", 
+  "y3" = "x^2", 
+  "y4" = "-x^2",
+  "y5" = "-x",
+  "y6" = "")) %>% 
+  mutate(equations = as.character(equations)) 
+
+formulas <-  list(parse(text = equations$equations[1]),
+                      parse(text = equations$equations[2]),
+                      parse(text = equations$equations[3]),
+                      parse(text = equations$equations[4]),
+                      parse(text = equations$equations[5]),
+                      parse(text = equations$equations[6])) %>% unlist(recursive = T) %>% c()
+
+
+data2 <- data.frame(x = seq(-10,10, by = 0.5))
+
+data2 <- data2 %>% 
+  mutate(y1 = eval(parse(text = equations$equations[1])),
+         y2 = eval(parse(text = equations$equations[2])),
+         y3 = eval(parse(text = equations$equations[3])),
+         y4 = eval(parse(text = equations$equations[4])),
+         y5 = eval(parse(text = equations$equations[5])), 
+         y6 = eval(parse(text = equations$equations[6])))
+data_ty2 <- data2 %>% pivot_longer(names_to = "equation", values_to = "y", -x) 
+
+p <- ggplot(data_ty2, aes(x = x, y = y, colour = equation)) +
+  geom_line(size = 1) + geom_point() +
+  geom_hline(aes(yintercept = 0)) + geom_vline(aes(xintercept = 0)) +
+  scale_color_brewer(palette = "Set2", labels = formulas) +
+  theme_minimal() +
+  coord_equal(xlim = c(-5,5), ylim = c(-10,10)) +
+  scale_x_continuous(breaks = c(-5:5)) +
+  scale_y_continuous(breaks = c(-10:10)) 
+  NULL
+p
+
+ggsave("Outputs/quadratics2.png", p)
+```
+
+
+```{r fig.width=10, dpi=600}
+equations <- data.frame(equations =
+  c("y1" = "x", 
+  "y2" = "0.25*(x^2)", 
+  "y3" = "0.5*(x^2)", 
+  "y4" = "2*(x^2)",
+  "y5" = "5*(x^2)",
+  "y6" = "10*(x^2)")) %>% 
+  mutate(equations = as.character(equations)) 
+
+formulas <-  list(parse(text = equations$equations[1]),
+                      parse(text = equations$equations[2]),
+                      parse(text = equations$equations[3]),
+                      parse(text = equations$equations[4]),
+                      parse(text = equations$equations[5]),
+                      parse(text = equations$equations[6])) %>% unlist(recursive = T) %>% c()
+
+data2 <- data.frame(x = seq(-10,10, by = 0.5))
+
+data2 <- data2 %>% 
+  mutate(y1 = eval(parse(text = equations$equations[1])),
+         y2 = eval(parse(text = equations$equations[2])),
+         y3 = eval(parse(text = equations$equations[3])),
+         y4 = eval(parse(text = equations$equations[4])),
+         y5 = eval(parse(text = equations$equations[5])), 
+         y6 = eval(parse(text = equations$equations[6])))
+data_ty2 <- data2 %>% pivot_longer(names_to = "equation", values_to = "y", -x) 
+
+p <- ggplot(data_ty2, aes(x = x, y = y, colour = equation)) +
+  geom_line(size = 1) + geom_point() +
+  geom_hline(aes(yintercept = 0)) + geom_vline(aes(xintercept = 0)) +
+  scale_color_brewer(palette = "Greens", labels = formulas) +
+  theme_minimal() +
+  coord_equal(xlim = c(-5,5), ylim = c(-10,10)) +
+  scale_x_continuous(breaks = c(-5:5)) +
+  scale_y_continuous(breaks = c(-10:10)) 
+  
+p
+
+ggsave("Outputs/quadratics3.png", p)
+```
+
+
+```{r fig.width=10, dpi=600}
+equations <- data.frame(equations =
+  c("y1" = "x^2", 
+  "y2" = "x^2 + 0.5*x", 
+  "y3" = "x^2 + x", 
+  "y4" = "x^2 + 2*x",
+  "y5" = "x^2 + 5*x",
+  "y6" = "x^2 + 10*x")) %>% 
+  mutate(equations = as.character(equations)) 
+
+formulas <-  list(parse(text = equations$equations[1]),
+                      parse(text = equations$equations[2]),
+                      parse(text = equations$equations[3]),
+                      parse(text = equations$equations[4]),
+                      parse(text = equations$equations[5]),
+                      parse(text = equations$equations[6])) %>% unlist(recursive = T) %>% c()
+
+data2 <- data.frame(x = seq(-10,10, by = 0.5))
+
+data2 <- data2 %>% 
+  mutate(y1 = eval(parse(text = equations$equations[1])),
+         y2 = eval(parse(text = equations$equations[2])),
+         y3 = eval(parse(text = equations$equations[3])),
+         y4 = eval(parse(text = equations$equations[4])),
+         y5 = eval(parse(text = equations$equations[5])), 
+         y6 = eval(parse(text = equations$equations[6])))
+data_ty2 <- data2 %>% pivot_longer(names_to = "equation", values_to = "y", -x) 
+
+p <- ggplot(data_ty2, aes(x = x, y = y, colour = equation)) +
+  geom_line(size = 1) + geom_point() +
+  geom_hline(aes(yintercept = 0)) + geom_vline(aes(xintercept = 0)) +
+  scale_color_brewer(palette = "Greens", labels = formulas) +
+  theme_minimal() +
+  coord_equal(xlim = c(-5,5), ylim = c(-10,10)) +
+  scale_x_continuous(breaks = c(-5:5)) +
+  scale_y_continuous(breaks = c(-10:10)) 
+  
+p
+
+ggsave("Outputs/quadratics4.png", p)
+```
+
+
+```{r fig.width=10, dpi=600}
+equations <- data.frame(equations =
+  c("y1" = "x^2", 
+  "y2" = "0.5 * (x^2) - 0.5*x", 
+  "y3" = "x^2 - x", 
+  "y4" = "x^2 - 2*x",
+  "y5" = "x^2 - 5*x",
+  "y6" = "x^2 - 7*x")) %>% 
+  mutate(equations = as.character(equations)) 
+
+formulas <-  list(parse(text = equations$equations[1]),
+                      parse(text = equations$equations[2]),
+                      parse(text = equations$equations[3]),
+                      parse(text = equations$equations[4]),
+                      parse(text = equations$equations[5]),
+                      parse(text = equations$equations[6])) %>% unlist(recursive = T) %>% c()
+
+data2 <- data.frame(x = seq(-10,10, by = 0.5))
+
+data2 <- data2 %>% 
+  mutate(y1 = eval(parse(text = equations$equations[1])),
+         y2 = eval(parse(text = equations$equations[2])),
+         y3 = eval(parse(text = equations$equations[3])),
+         y4 = eval(parse(text = equations$equations[4])),
+         y5 = eval(parse(text = equations$equations[5])), 
+         y6 = eval(parse(text = equations$equations[6])))
+data_ty2 <- data2 %>% pivot_longer(names_to = "equation", values_to = "y", -x) 
+
+p <- ggplot(data_ty2, aes(x = x, y = y, colour = equation)) +
+  geom_line(size = 1) + geom_point() +
+  geom_hline(aes(yintercept = 0)) + geom_vline(aes(xintercept = 0)) +
+  scale_color_brewer(palette = "Set2", labels = formulas) +
+  theme_minimal() +
+  coord_equal(xlim = c(-5,5), ylim = c(-10,10)) +
+  scale_x_continuous(breaks = c(-5:5)) +
+  scale_y_continuous(breaks = c(-10:10)) 
+  
+p
+
+ggsave("Outputs/quadratics5.png", p)
+```
+
+
+```{r fig.width=10, dpi=600}
+equations <- data.frame(equations =
+  c("y1" = "-(x^2)", 
+  "y2" = "2 * (x^2) + 0.5*x", 
+  "y3" = "-5 * (x^2) + x", 
+  "y4" = "x^2 - 2*x",
+  "y5" = "-(x^2) - 5*x",
+  "y6" = "-0.5 * (x^2) - 2*x")) %>% 
+  mutate(equations = as.character(equations)) 
+
+formulas <-  list(parse(text = equations$equations[1]),
+                      parse(text = equations$equations[2]),
+                      parse(text = equations$equations[3]),
+                      parse(text = equations$equations[4]),
+                      parse(text = equations$equations[5]),
+                      parse(text = equations$equations[6])) %>% unlist(recursive = T) %>% c()
+
+data2 <- data.frame(x = seq(-10,10, by = 0.5))
+
+data2 <- data2 %>% 
+  mutate(y1 = eval(parse(text = equations$equations[1])),
+         y2 = eval(parse(text = equations$equations[2])),
+         y3 = eval(parse(text = equations$equations[3])),
+         y4 = eval(parse(text = equations$equations[4])),
+         y5 = eval(parse(text = equations$equations[5])), 
+         y6 = eval(parse(text = equations$equations[6])))
+data_ty2 <- data2 %>% pivot_longer(names_to = "equation", values_to = "y", -x) 
+
+p <- ggplot(data_ty2, aes(x = x, y = y, colour = equation)) +
+  geom_line(size = 1) + geom_point() +
+  geom_hline(aes(yintercept = 0)) + geom_vline(aes(xintercept = 0)) +
+  scale_color_brewer(palette = "Set1", labels = formulas) +
+  theme_minimal() +
+  coord_equal(xlim = c(-5,5), ylim = c(-10,10)) +
+  scale_x_continuous(breaks = c(-5:5)) +
+  scale_y_continuous(breaks = c(-10:10)) 
+  
+p
+
+ggsave("Outputs/quadratics6.png", p)
+```
+
+
+
+
+
+
